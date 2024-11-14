@@ -11,14 +11,18 @@ API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 # Define the fixed question with larger font and bold using Markdown for proper rendering
 QUESTION = "**Create a creative advertisement about a new solution to the storrowing problem.**"
 
-# Unique prompt types for introverts and extroverts, each repeated 4 times to reach 400 prompts
 introvert_prompts = [
-    "Create a gentle, peaceful ad addressing the storrowing problem.",
-    "Offer a reflective, calm message about a new storrowing solution.",
-    # Add remaining 98 unique prompts here...
-] * 4  # Repeats each unique prompt 4 times to make 400 prompts
+    f"{QUESTION} Offer a quiet, reflective message.",
+    f"{QUESTION} Develop a subtle, insightful ad.",
+    f"{QUESTION} Provide a calm and thought-provoking promotional angle.",
+    f"{QUESTION} Share an introspective, thoughtful ad message.",
+    f"{QUESTION} Present a serene, deep advertisement concept.",
+    f"{QUESTION} Propose a gentle, introspective advertisement idea.",
+    f"{QUESTION} Craft a soothing and thoughtful promotional message.",
+    f"{QUESTION} Design an understated, reflective ad."
+] * 50  # Replicates to create a pool of 400 options when shuffled
 
-# Function to query the Hugging Face API
+# Function to query the Hugging Face API with randomness for diversity
 def query_huggingface(personality):
     headers = {"Authorization": f"Bearer {API_KEY}"}
 
@@ -46,31 +50,22 @@ def query_huggingface(personality):
         # General error message with specific status code
         return f"Error {response.status_code}: {response.text}"
 
-# Create the Gradio Blocks for Introvert and Extrovert Interfaces
+# Create the Gradio interface for Introvert responses
 def create_introvert_interface():
     with gr.Blocks() as introvert_interface:
         gr.Markdown("# Introvert Profile")
 
-        # Display instructions and question
-        gr.Markdown("""
-        **Instructions for Respondents**
-
-        Write your response to the following question or problem based on your interaction with the Large Language Model.
-        Once you have completed your response, copy and paste the content into the Qualtrics survey and then submit the survey.
-
-        """ + QUESTION)
+        # Display question prompt as instructions
+        gr.Markdown("### Instructions:\n\nPlease respond to the following prompt:\n\n" + QUESTION)
 
         with gr.Row():
-            # Input box at the top
-            user_definition = gr.Textbox(label="Input", lines=5, placeholder="Type your own response here based on the generated advertisement.")
+            user_input = gr.Textbox(label="INPUT", placeholder="Type your response here.", lines=4)
         with gr.Row():
-            # Output box below Input
-            generated_advertisement = gr.Textbox(label="Output", lines=5)
+            generated_advertisement = gr.Textbox(label="OUTPUT", lines=4)
         with gr.Row():
-            # Generate button at the bottom
             generate_button = gr.Button("Generate")
 
-        # Connect generate button to the function to get model response
+        # Button to trigger the generation
         generate_button.click(lambda: query_huggingface("Introvert"), None, generated_advertisement)
     return introvert_interface
 
